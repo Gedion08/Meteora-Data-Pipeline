@@ -19,12 +19,19 @@ This project is a TypeScript pipeline scaffold for ingesting Meteora DLMM and DA
 3. Build and run:
 
    ```bash
+### Persistence to Postgres
+
+To enable persistent storage to Postgres, set `DATABASE_URL` in your environment or in a `.env` file and then generate/migrate the Prisma schema:
+
+```bash
+npx prisma generate
+npx prisma migrate deploy  # use `prisma migrate dev` for local development
+```
+
+When `DATABASE_URL` is present the pipeline will upsert normalized pools into the `Pool` table.
    npm run pipeline
    ```
 
-## What it does
-
-- Fetches DLMM pools from `https://dlmm.datapi.meteora.ag/pools`
 - Fetches DAMM v2 pools from `https://damm-v2.datapi.meteora.ag/pools`
 - Prints a summary of the fetched data
 

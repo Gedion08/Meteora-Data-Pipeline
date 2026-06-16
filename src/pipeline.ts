@@ -314,6 +314,15 @@ export async function persistDlmmPools(raw: { data: DlmmPool[] }) {
   const ts = Date.now();
   const jsonFile = await saveJson(`dlmm_pools_${ts}.json`, { fetched_at: ts, count: normalized.length, data: normalized });
   await saveCsv(`dlmm_pools_${ts}.csv`, normalized as unknown as Record<string, unknown>[]);
+  // optional DB persistence
+  if (process.env.DATABASE_URL) {
+    try {
+      const { upsertPools } = await import('./db');
+      await upsertPools(normalized);
+    } catch (e) {
+      logger.warn('DB persistence failed:', e);
+    }
+  }
   return jsonFile;
 }
 
@@ -324,6 +333,14 @@ export async function persistDammV2Pools(raw: { data: DammV2Pool[] }) {
   const ts = Date.now();
   const jsonFile = await saveJson(`dammv2_pools_${ts}.json`, { fetched_at: ts, count: normalized.length, data: normalized });
   await saveCsv(`dammv2_pools_${ts}.csv`, normalized as unknown as Record<string, unknown>[]);
+  if (process.env.DATABASE_URL) {
+    try {
+      const { upsertPools } = await import('./db');
+      await upsertPools(normalized);
+    } catch (e) {
+      logger.warn('DB persistence failed:', e);
+    }
+  }
   return jsonFile;
 }
 

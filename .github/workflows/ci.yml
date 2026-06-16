@@ -21,3 +21,19 @@ jobs:
         run: npm test --silent
       - name: TypeScript build
         run: npm run build
+      - name: Build and push Docker image (main only)
+        if: github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/meteora-pipeline:latest
+          file: Dockerfile
+      - name: Publish npm release (semantic-release)
+        if: github.ref == 'refs/heads/main'
+        uses: cycjimmy/semantic-release-action@v3
+        with:
+          extra_plugins: |
+            @semantic-release/changelog
+            @semantic-release/git
+            @semantic-release/github
