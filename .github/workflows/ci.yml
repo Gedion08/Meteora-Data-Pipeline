@@ -32,7 +32,7 @@ jobs:
         run: npm run build
       - name: Build and push Docker image (main only)
         if: github.ref == 'refs/heads/main'
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: .
           push: true
