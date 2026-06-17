@@ -1,0 +1,58 @@
+{
+  "dashboard": {
+    "title": "Meteora Pipeline",
+    "description": "Monitoring dashboard for Meteora DLMM/DAMM v2 data pipeline",
+    "tags": ["meteora", "pipeline"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Pools Fetched (Total)",
+        "targets": [
+          {
+            "expr": "increase(pools_fetched_total[1h])",
+            "legendFormat": "{{ source }}"
+          }
+        ],
+        "type": "graph"
+      },
+      {
+        "id": 2,
+        "title": "Fetch Latency (p95)",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(pools_fetch_duration_seconds_bucket[5m]))",
+            "legendFormat": "{{ source }}"
+          }
+        ],
+        "type": "graph"
+      },
+      {
+        "id": 3,
+        "title": "Last Fetch Timestamp",
+        "targets": [
+          {
+            "expr": "pools_last_fetch_timestamp / 1000",
+            "legendFormat": "{{ source }}"
+          }
+        ],
+        "type": "stat"
+      },
+      {
+        "id": 4,
+        "title": "Uptime (Node.js)",
+        "targets": [
+          {
+            "expr": "process_uptime_seconds"
+          }
+        ],
+        "type": "stat"
+      }
+    ],
+    "refresh": "30s",
+    "time": {
+      "from": "now-6h",
+      "to": "now"
+    }
+  }
+}

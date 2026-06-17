@@ -17,6 +17,15 @@ jobs:
           node-version: '18'
       - name: Install deps
         run: npm ci
+      - name: npm audit
+        run: npm audit --audit-level=moderate || true
+      - name: Generate SBOM
+        run: npm install -g cyclonedx-npm && cyclonedx-npm --output-file bom.xml
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v3
+        with:
+          name: sbom
+          path: bom.xml
       - name: Run tests
         run: npm test --silent
       - name: TypeScript build

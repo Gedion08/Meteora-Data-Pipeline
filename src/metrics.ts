@@ -25,6 +25,20 @@ export const fetchDuration = new client.Histogram({
   registers: [register],
 });
 
+export const databaseErrors = new client.Counter({
+  name: 'database_errors_total',
+  help: 'Total database errors',
+  labelNames: ['operation'],
+  registers: [register],
+});
+
+export const validationErrors = new client.Counter({
+  name: 'validation_errors_total',
+  help: 'Total validation errors',
+  labelNames: ['source'],
+  registers: [register],
+});
+
 export function metricsMetrics() {
   return register.metrics();
 }

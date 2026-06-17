@@ -1,0 +1,16 @@
+apiVersion: v2
+name: meteora-pipeline
+description: Helm chart for Meteora Data Pipeline
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+maintainers:
+  - name: Meteora Team
+    email: team@meteora.ag
+keywords:
+  - liquidity
+  - dex
+  - trading
+  - pool
+  - dlmm
+icon: https://meteora.ag/favicon.ico

@@ -3,15 +3,10 @@ import fs from "fs/promises";
 import path from "path";
 import { z } from "zod";
 import dotenv from "dotenv";
-import winston from "winston";
 import { poolsFetched, lastFetch, fetchDuration } from './metrics.ts';
+import { logger } from './logging.ts';
 
 dotenv.config();
-
-const logger = winston.createLogger({
-  level: process.env.LOG_LEVEL || "info",
-  transports: [new winston.transports.Console({ format: winston.format.simple() })],
-});
 
 export type PoolToken = {
   address: string;
@@ -180,8 +175,9 @@ const DlmmPoolSchema = z.object({
 const DammV2PoolSchema = z.object({
   address: z.string(),
   name: z.string().optional(),
-  token_a: TokenSchema,
-  token_b: TokenSchema,
+  // tokens may be missing or shaped differently in some API responses; accept optional
+  token_a: TokenSchema.optional(),
+  token_b: TokenSchema.optional(),
   tvl: z.number().optional(),
   current_price: z.number().optional(),
   apr: z.number().optional(),
@@ -248,11 +244,24 @@ export function normalizeDlmmPool(p: DlmmPool): PoolNormalized {
 }
 
 export function normalizeDammV2Pool(p: DammV2Pool): PoolNormalized {
+  // Provide safe fallbacks when token_a/token_b are missing
+  const tokenA = (p as any).token_a ?? {};
+  const tokenB = (p as any).token_b ?? {};
   return {
     address: p.address,
     name: p.name,
-    base_token: { address: p.token_a.address, symbol: p.token_a.symbol || "", decimals: p.token_a.decimals, price: p.token_a.price },
-    quote_token: { address: p.token_b.address, symbol: p.token_b.symbol || "", decimals: p.token_b.decimals, price: p.token_b.price },
+    base_token: {
+      address: tokenA.address ?? "",
+      symbol: tokenA.symbol ?? "",
+      decimals: tokenA.decimals ?? 0,
+      price: tokenA.price,
+    },
+    quote_token: {
+      address: tokenB.address ?? "",
+      symbol: tokenB.symbol ?? "",
+      decimals: tokenB.decimals ?? 0,
+      price: tokenB.price,
+    },
     tvl: p.tvl,
     current_price: p.current_price,
     apr: p.apr,
